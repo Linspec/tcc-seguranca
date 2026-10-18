@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalhes do Aluno - {{ usuario_alvo.username }}</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e2f; color: #f4f4f9; padding: 30px; margin: 0; }
+        .container { max-width: 900px; margin: 0 auto; background: #27293d; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        h1 { color: #00f2fe; margin-top: 0; }
+        .info-box { background: #32324d; padding: 15px; border-radius: 6px; margin-bottom: 25px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 10px; text-align: left; border-bottom: 1px solid #383852; font-size: 13px; }
+        th { color: #00f2fe; background-color: #383852; }
+        .btn-voltar { display: inline-block; background: #00cec9; color: #1e1e2f; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: bold; margin-top: 20px; }
+        .btn-voltar:hover { background: #81ecec; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Relatório Individual do Aluno</h1>
+        <div class="info-box">
+            <p><strong>Utilizador:</strong> {{ usuario_alvo.username }}</p>
+            <p><strong>Nome Completo:</strong> {{ usuario_alvo.first_name|default:"Não informado" }}</p>
+            <p><strong>E-mail:</strong> {{ usuario_alvo.email }}</p>
+            <p><strong>CPF:</strong> {{ usuario_alvo.cpf|default:"Não informado" }}</p>
+            <p><strong>Idade:</strong> {{ usuario_alvo.idade|default:"Não informada" }}</p>
+        </div>
+
+        <h3>Histórico de Respostas e Acertos nos Módulos:</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Módulo</th>
+                    <th>Pergunta</th>
+                    <th>Alternativa Escolhida</th>
+                    <th>Acertou?</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in respostas %}
+                <tr>
+                    <td>{{ r.pergunta.modulo.titulo }}</td>
+                    <td>{{ r.pergunta.texto_pergunta }}</td>
+                    <td>{{ r.alternativa_escolhida.texto_alternativa }}</td>
+                    <td>
+                        {% if r.alternativa_escolhida.is_correta %}
+                            <span style="color: #00b894; font-weight: bold;">Sim</span>
+                        {% else %}
+                            <span style="color: #d63031; font-weight: bold;">Não</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.data_resposta|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; color: #a9a9b2;">Este aluno ainda não respondeu a nenhum questionário.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <a href="{% url 'admin_dashboard' %}" class="btn-voltar">← Voltar ao Painel Analítico</a>
+    </div>
+</body>
+</html>
