@@ -26,7 +26,6 @@
             <div class="error-msg">{{ erro }}</div>
         {% endif %}
 
-
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
@@ -41,14 +40,15 @@
         </form>
 
         {% load socialaccount %}
-
-        <!-- Botão de Login Social Google -->
-        <div style="margin-top: 20px; text-align: center;">
-            <p style="color: #666; font-size: 13px; margin-bottom: 10px;">ou aceda de forma rápida com:</p>
-             <a href="{% provider_login_url 'google' %}" style="display: inline-block; background-color: #4285F4; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-        🔵        Entrar com a Conta Google
-             </a>
-        </div>628426
+        {% get_providers as socialaccount_providers %}
+        {% if socialaccount_providers %}
+            <div style="margin-top: 20px; text-align: center;">
+                <p style="color: #666; font-size: 13px; margin-bottom: 10px;">ou aceda de forma rápida com:</p>
+                <a href="{% provider_login_url 'google' %}" style="display: inline-block; background-color: #4285F4; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    🔵 Entrar com a Conta Google
+                </a>
+            </div>
+        {% endif %}
 
         <div class="links">
             <p>Ainda não tem conta? <a href="{% url 'cadastro' %}">Registe-se aqui</a></p>
