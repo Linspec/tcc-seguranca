@@ -123,12 +123,21 @@ AUTH_USER_MODEL = 'plataforma.Usuario'
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 INSTALLED_APPS = [
-    # ... seus apps anteriores ...
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # Apps do allauth para suporte a login social
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+
+    # O seu aplicativo do sistema
     'plataforma',
 ]
 
