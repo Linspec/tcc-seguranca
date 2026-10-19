@@ -14,7 +14,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = 'django-insecure-z#s2imem4)z%w53^f)49lyrai*qgm&k3br9p&9$ck&mt*n%qy&'
 
-# DEBUG deve ser False em produção (Render), mas deixamos True para desenvolvimento local
+# DEBUG deve ser False em produção (Render), mas deixamos True para desenvolvimento/testes
 DEBUG = True
 
 # Permite acessos tanto locais quanto do Render
@@ -138,11 +138,17 @@ LOGOUT_REDIRECT_URL = '/login/'
 ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGOUT_REDIRECT_URL = '/login/'
 
+# Configurações de autenticação e conta
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
-# Configuração fixa do Social Login do Google de forma segura
+# Auto-conexão para evitar telas de erro ou "Falha no login de terceiros"
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
+
+# Configuração fixa do Social Login do Google de forma segura via variáveis de ambiente
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
