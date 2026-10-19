@@ -1,3 +1,4 @@
+import random
 import openpyxl
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
@@ -26,6 +27,7 @@ def login_view(request):
 
 def logout_view(request):
     auth_logout(request)
+    request.session.flush()  # Limpa completamente a sessão do navegador
     return redirect('login')
 
 
@@ -33,7 +35,7 @@ def home(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    # Se for admin, redireciona para tela de admin
+    # Se for admin, redireciona para a tela de admin
     if request.user.is_staff or request.user.is_superuser:
         return redirect('admin_dashboard')
 
@@ -81,7 +83,7 @@ def admin_dashboard(request):
     usuarios_comuns = Usuario.objects.filter(is_staff=False, is_superuser=False)
     total_usuarios_comuns = usuarios_comuns.count()
 
-    # 1. media de conclusão  por módulo
+    # 1. Média de conclusão por módulo
     metricas_modulos = []
     for m in modulos:
         perguntas = m.perguntas.all()
@@ -102,7 +104,7 @@ def admin_dashboard(request):
             'taxa_conclusao': round(taxa, 1)
         })
 
-    # 2. media de erro por questão
+    # 2. Média de erro por questão
     metricas_questoes = []
     perguntas_all = Pergunta.objects.all()
     for p in perguntas_all:
@@ -118,7 +120,7 @@ def admin_dashboard(request):
             'taxa_erro': round(taxa_erro, 1)
         })
 
-    # 3. Lista completa de usuários normal e admin
+    # 3. Lista completa de usuários normais e admin
     todos_usuarios = Usuario.objects.all()
 
     contexto = {
@@ -173,17 +175,27 @@ def detalhe_modulo(request, modulo_id):
         return redirect('admin_dashboard')
 
     modulo = get_object_or_404(Modulo, id=modulo_id)
-    perguntas = modulo.perguntas.all()
+
+    # Seleciona aleatoriamente até 10 perguntas do módulo
+    todas_perguntas = list(modulo.perguntas.all())
+    random.shuffle(todas_perguntas)
+    perguntas = todas_perguntas[:10]
+
+    # Embaralha as alternativas de cada pergunta
+    for p in perguntas:
+        alternativas = list(p.alternativas.all())
+        random.shuffle(alternativas)
+        p.alternativas_embaralhadas = alternativas
 
     if request.method == 'POST':
-        # Recolhe avaliações opcionais do módulo enviadas no final da página
         avaliacao_mod = request.POST.get('avaliacao_modulo', '')
         como_ajudou_mod = request.POST.get('como_ajudou', '')
 
-        RespostaUsuario.objects.filter(usuario=request.user, pergunta__in=perguntas).delete()
+        # Remove respostas anteriores deste módulo para recalcular
+        RespostaUsuario.objects.filter(usuario=request.user, pergunta__in=todas_perguntas).delete()
 
         acertos = 0
-        total_perguntas = perguntas.count()
+        total_perguntas = len(perguntas)
         detalhes_respostas = []
 
         for pergunta in perguntas:
@@ -192,8 +204,7 @@ def detalhe_modulo(request, modulo_id):
                 alternativa = Alternativa.objects.get(id=alternativa_id)
                 motivo = request.POST.get(f'motivo_{pergunta.id}', '')
                 viveu_parecido = request.POST.get(f'viveu_parecido_{pergunta.id}', 'Nao')
-                experiencia = request.POST.get(f'experiencia_{pergunta.id}',
-                                               '') if viveu_parecido == 'Sim' else 'Não vivenciado'
+                experiencia = request.POST.get(f'experiencia_{pergunta.id}', '') if viveu_parecido == 'Sim' else 'Não vivenciado'
                 suspeita = request.POST.get(f'suspeita_{pergunta.id}', '')
 
                 if alternativa.is_correta:
@@ -278,83 +289,6 @@ def exportar_relatorio_excel(request):
     return response
 
 
-import random  # <-- Certifique-se de importar o random no topo do arquivo views.py
-
-import random
-
-
-def detalhe_modulo(request, modulo_id):
-    if not request.user.is_authenticated:
-        return redirect('login')
-    if request.user.is_staff:
-        return redirect('admin_dashboard')
-
-    modulo = get_object_or_404(Modulo, id=modulo_id)
-
-    # Pega todas as perguntas do módulo e seleciona aleatoriamente até 10 perguntas
-    todas_perguntas = list(modulo.perguntas.all())
-    random.shuffle(todas_perguntas)
-    perguntas = todas_perguntas[:10]  # Limita exatamente a 10 perguntas por tentativa
-
-    # Embaralha as alternativas de cada uma das 10 perguntas
-    for p in perguntas:
-        alternativas = list(p.alternativas.all())
-        random.shuffle(alternativas)  # Embaralha as opções de resposta
-        p.alternativas_embaralhadas = alternativas
-
-    if request.method == 'POST':
-        avaliacao_mod = request.POST.get('avaliacao_modulo', '')
-        como_ajudou_mod = request.POST.get('como_ajudou', '')
-
-        # Remove respostas anteriores deste módulo para recalcular
-        RespostaUsuario.objects.filter(usuario=request.user, pergunta__in=todas_perguntas).delete()
-
-        acertos = 0
-        total_perguntas = len(perguntas)
-        detalhes_respostas = []
-
-        for pergunta in perguntas:
-            alternativa_id = request.POST.get(f'pergunta_{pergunta.id}')
-            if alternativa_id:
-                alternativa = Alternativa.objects.get(id=alternativa_id)
-                motivo = request.POST.get(f'motivo_{pergunta.id}', '')
-                viveu_parecido = request.POST.get(f'viveu_parecido_{pergunta.id}', 'Nao')
-                experiencia = request.POST.get(f'experiencia_{pergunta.id}',
-                                               '') if viveu_parecido == 'Sim' else 'Não vivenciado'
-                suspeita = request.POST.get(f'suspeita_{pergunta.id}', '')
-
-                if alternativa.is_correta:
-                    acertos += 1
-
-                RespostaUsuario.objects.create(
-                    usuario=request.user,
-                    pergunta=pergunta,
-                    alternativa_escolhida=alternativa,
-                    motivo_escolha=motivo,
-                    viveu_parecido=viveu_parecido,
-                    experiencia_passada=experiencia,
-                    suspeita_outra=suspeita,
-                    avaliacao_modulo=avaliacao_mod,
-                    como_ajudou=como_ajudou_mod
-                )
-
-                detalhes_respostas.append({
-                    'pergunta': pergunta,
-                    'escolhida': alternativa,
-                    'acertou': alternativa.is_correta,
-                    'feedback': alternativa.explicacao_feedback
-                })
-
-        contexto = {
-            'modulo': modulo,
-            'acertos': acertos,
-            'total_perguntas': total_perguntas,
-            'detalhes_respostas': detalhes_respostas
-        }
-        return render(request, 'resultado_quiz.html', contexto)
-
-    return render(request, 'detalhe_modulo.html', {'modulo': modulo, 'perguntas': perguntas})
-
 def importar_banca_excel(request):
     if not request.user.is_authenticated or not request.user.is_staff:
         return redirect('login')
@@ -364,15 +298,6 @@ def importar_banca_excel(request):
         wb = openpyxl.load_workbook(excel_file)
         sheet = wb.active
 
-        # Formato esperado nas colunas da planilha:
-        # Coluna A: Título do Módulo
-        # Coluna B: Descrição do Módulo
-        # Coluna C: Texto da Pergunta
-        # Coluna D: Alternativa 1 | Coluna E: É Correta? (Sim/Não) | Coluna F: Feedback 1
-        # Coluna G: Alternativa 2 | Coluna H: É Correta? (Sim/Não) | Coluna I: Feedback 2
-        # Coluna J: Alternativa 3 | Coluna K: É Correta? (Sim/Não) | Coluna L: Feedback 3
-        # Coluna M: Alternativa 4 | Coluna N: É Correta? (Sim/Não) | Coluna O: Feedback 4
-
         for row in sheet.iter_rows(min_row=2, values_only=True):
             titulo_mod = row[0]
             desc_mod = row[1]
@@ -381,17 +306,13 @@ def importar_banca_excel(request):
             if not titulo_mod or not texto_perg:
                 continue
 
-            # Cria ou recupera o módulo
             modulo, _ = Modulo.objects.get_or_create(
                 titulo=titulo_mod,
                 defaults={'descricao': desc_mod}
             )
 
-            # Cria a pergunta
             pergunta = Pergunta.objects.create(modulo=modulo, texto_pergunta=texto_perg)
 
-            # Processa as alternativas em blocos de 3 colunas (Texto, Correta?, Feedback)
-            # Índices iniciais: Alt 1 (3,4,5), Alt 2 (6,7,8), Alt 3 (9,10,11), Alt 4 (12,13,14)
             for i in range(3, 15, 3):
                 if i < len(row) and row[i]:
                     txt_alt = row[i]
