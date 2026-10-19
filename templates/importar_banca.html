@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Importar Banca de Perguntas</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #1e1e2f; color: #f4f4f9; padding: 40px; }
+        .container { max-width: 600px; margin: 0 auto; background: #27293d; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        h1 { color: #00f2fe; margin-top: 0; }
+        p { color: #a9a9b2; font-size: 14px; line-height: 1.5; }
+        .form-group { margin: 20px 0; }
+        input[type="file"] { background: #32324d; padding: 10px; width: 100%; border: 1px solid #383852; border-radius: 4px; color: white; box-sizing: border-box; }
+        .btn-enviar { background-color: #00b894; color: white; padding: 12px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; }
+        .btn-enviar:hover { background-color: #55efc4; color: #1e1e2f; }
+        .btn-voltar { display: block; text-align: center; margin-top: 15px; color: #00cec9; text-decoration: none; }
+        .btn-voltar:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 Importação em Massa de Módulos</h1>
+        <p>Faça o upload de uma planilha Excel contendo o título do módulo, as perguntas e as 4 alternativas com seus respectivos feedbacks e marcação de qual é a correta.</p>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="file" name="arquivo_excel" accept=".xlsx, .xls" required>
+            </div>
+            <button type="submit" class="btn-enviar">Importar Banca de Questões</button>
+        </form>
+
+        <a href="{% url 'admin_dashboard' %}" class="btn-voltar">← Voltar ao Painel Analítico</a>
+    </div>
+</body>
+</html>

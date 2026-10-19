@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Registo - Sistema Educativo</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .cadastro-card { background: white; padding: 30px 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 450px; margin: 20px; }
+        h2 { text-align: center; color: #004080; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .errorlist { color: #dc3545; font-size: 12px; margin: 5px 0 0 0; padding-left: 15px; }
+        .btn-submit { width: 100%; padding: 12px; background-color: #004080; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; }
+        .btn-submit:hover { background-color: #003366; }
+        .links { text-align: center; margin-top: 15px; font-size: 14px; }
+        .links a { color: #004080; text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="cadastro-card">
+        <h2>Criar Nova Conta</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            
+            {{ form.non_field_errors }}
+
+            {% for field in form %}
+                <div class="form-group">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    {{ field.errors }}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-submit">Registar</button>
+        </form>
+
+        <div class="links">
+            <p>Já tem uma conta? <a href="{% url 'login' %}">Faça login aqui</a></p>
+        </div>
+    </div>
+</body>
+</html>

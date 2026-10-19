@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Módulo: {{ modulo.titulo }}</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f0f2f5; color: #333; line-height: 1.6; }
+        header { background-color: #004080; color: white; padding: 20px 40px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .container { max-width: 850px; margin: 30px auto; background: white; padding: 40px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+
+        /* Estilo do Vídeo Introdutório Responsivo */
+        .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; background: #000; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px; }
+
+        .pergunta-card { background: #f8fafc; border-left: 4px solid #004080; padding: 20px; margin-bottom: 30px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .alternativa { display: block; margin: 12px 0; cursor: pointer; font-size: 15px; }
+        .qualitativo-box { margin-top: 15px; padding-top: 15px; border-top: 1px dashed #cbd5e1; }
+        .qualitativo-box label { display: block; font-size: 13px; font-weight: bold; color: #475569; margin-bottom: 5px; }
+        .qualitativo-box textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-size: 13px; }
+        .condicional-box { display: none; margin-top: 10px; }
+
+        .secao-feedback { background: #f1f5f9; padding: 25px; border-radius: 8px; margin-top: 30px; border: 1px solid #e2e8f0; }
+        .btn-enviar { background-color: #10b981; color: white; border: none; padding: 14px 25px; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer; display: block; width: 100%; margin-top: 30px; transition: background 0.2s; }
+        .btn-enviar:hover { background-color: #059669; }
+    </style>
+    <script>
+        function toggleExperiencia(perguntaId, valor) {
+            const caixa = document.getElementById('box_exp_' + perguntaId);
+            if (valor === 'Sim') {
+                caixa.style.display = 'block';
+                caixa.querySelector('textarea').setAttribute('required', 'true');
+            } else {
+                caixa.style.display = 'none';
+                caixa.querySelector('textarea').removeAttribute('required');
+                caixa.querySelector('textarea').value = '';
+            }
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <h2>{{ modulo.titulo }}</h2>
+        <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9;">{{ modulo.descricao }}</p>
+    </header>
+
+    <div class="container">
+
+        <!-- Bloco do Vídeo Introdutório (Caso o Admin tenha preenchido a URL) -->
+        {% if modulo.video_url %}
+            <div style="margin-bottom: 25px;">
+                <h3 style="color: #004080; margin-bottom: 10px;">🎥 Vídeo Introdutório: Situações Reais do Dia a Dia</h3>
+                <p style="font-size: 14px; color: #64748b; margin-bottom: 15px;">Assista ao vídeo abaixo para compreender o contexto prático dos riscos abordados neste módulo antes de iniciar o questionário.</p>
+                <div class="video-container">
+                    <iframe src="{{ modulo.video_url }}" allowfullscreen></iframe>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if modulo.explicacao_pratica %}
+            <div style="background: #e0f2fe; border: 1px solid #bae6fd; padding: 18px; border-radius: 8px; margin-bottom: 30px; color: #0369a1;">
+                <strong>💡 Contexto Prático de Proteção:</strong>
+                <p style="margin: 5px 0 0 0; font-size: 14px;">{{ modulo.explicacao_pratica }}</p>
+            </div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% for pergunta in perguntas %}
+                <div class="pergunta-card">
+                    <p style="font-size: 16px; color: #1e293b;"><strong>Questão {{ forloop.counter }}:</strong> {{ pergunta.texto_pergunta }}</p>
+
+                    <!-- mistura pergunta -->
+                    {% for alt in pergunta.alternativas_embaralhadas %}
+                        <label class="alternativa">
+                            <input type="radio" name="pergunta_{{ pergunta.id }}" value="{{ alt.id }}" required>
+                            {{ alt.texto_alternativa }}
+                        </label>
+                    {% endfor %}
+
+                    <div class="qualitativo-box">
+                        <div style="margin-bottom: 12px;">
+                            <label>Por que escolheu esta resposta?</label>
+                            <textarea name="motivo_{{ pergunta.id }}" rows="2" placeholder="Explique brevemente o seu raciocínio..." required></textarea>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label>Já viveu algo parecido?</label>
+                            <label style="display: inline; margin-right: 20px; font-weight: normal; cursor: pointer;">
+                                <input type="radio" name="viveu_parecido_{{ pergunta.id }}" value="Sim" onclick="toggleExperiencia('{{ pergunta.id }}', 'Sim')" required> Sim
+                            </label>
+                            <label style="display: inline; font-weight: normal; cursor: pointer;">
+                                <input type="radio" name="viveu_parecido_{{ pergunta.id }}" value="Nao" onclick="toggleExperiencia('{{ pergunta.id }}', 'Nao')" required> Não
+                            </label>
+                        </div>
+
+                        <div id="box_exp_{{ pergunta.id }}" class="condicional-box">
+                            <label>E como foi?</label>
+                            <textarea name="experiencia_{{ pergunta.id }}" rows="2" placeholder="Descreva brevemente o que aconteceu e como lidou..."></textarea>
+                        </div>
+
+                        <div>
+                            <label>Suspeita da outra alternativa? Por que?</label>
+                            <textarea name="suspeita_{{ pergunta.id }}" rows="2" placeholder="Descreva se teve dúvidas entre as opções..." required></textarea>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+            <div class="secao-feedback">
+                <h3 style="margin-top: 0; color: #1e293b; font-size: 16px;">💬 Avaliação e Impacto do Módulo (Opcional)</h3>
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; font-size: 13px; font-weight: bold; color: #475569; margin-bottom: 5px;">Gostaria de indicar alguma melhoria para este módulo?</label>
+                    <textarea name="avaliacao_modulo" rows="2" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" placeholder="Críticas, sugestões ou pontos de melhoria..."></textarea>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 13px; font-weight: bold; color: #475569; margin-bottom: 5px;">Como este módulo ajudou você no seu dia a dia?</label>
+                    <textarea name="como_ajudou" rows="2" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" placeholder="Relate o impacto prático do aprendizado..."></textarea>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-enviar">Submeter Respostas e Conquistar Badge</button>
+        </form>
+    </div>
+</body>
+</html>

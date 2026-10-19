@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Sistema Educativo</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #004080; margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 12px; background-color: #004080; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; }
+        .btn-submit:hover { background-color: #003366; }
+        .error-msg { color: #dc3545; background-color: #f8d7da; padding: 10px; border-radius: 4px; margin-bottom: 15px; text-align: center; font-size: 14px; }
+        .links { text-align: center; margin-top: 15px; font-size: 14px; }
+        .links a { color: #004080; text-decoration: none; }
+        .links a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2>Entrar na Plataforma</h2>
+
+        {% if erro %}
+            <div class="error-msg">{{ erro }}</div>
+        {% endif %}
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Nome de Utilizador</label>
+                <input type="text" name="username" required>
+            </div>
+            <div class="form-group">
+                <label>Palavra-passe (Senha)</label>
+                <input type="password" name="password" required>
+            </div>
+            <button type="submit" class="btn-submit">Entrar</button>
+        </form>
+
+        {% load socialaccount %}
+
+        <!-- Botão de Login Social Google Direto -->
+        <div style="margin-top: 20px; text-align: center;">
+            <p style="color: #666; font-size: 13px; margin-bottom: 10px;">ou aceda de forma rápida com:</p>
+            <a href="{% provider_login_url 'google' %}" style="display: inline-block; background-color: #4285F4; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                🔵 Entrar com a Conta Google
+            </a>
+        </div>
+
+        <div class="links">
+            <p>Ainda não tem conta? <a href="{% url 'cadastro' %}">Registe-se aqui</a></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Trilha de Conhecimento - Cibersegurança</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; background-color: #f0f2f5; color: #333; }
+        header { background-color: #004080; color: white; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .container { max-width: 850px; margin: 40px auto; padding: 0 20px; }
+
+        .trilha-header { text-align: center; margin-bottom: 40px; }
+        .trilha-header h2 { color: #004080; margin-bottom: 5px; font-size: 26px; }
+        .trilha-header p { color: #666; font-size: 15px; }
+
+        /* Estilo da Trilha Vertical */
+        .trilha-container { position: relative; padding-left: 40px; }
+        .trilha-container::before { content: ''; position: absolute; left: 19px; top: 15px; bottom: 15px; width: 4px; background: #cbd5e1; border-radius: 2px; }
+
+        .trilha-passo { position: relative; margin-bottom: 30px; background: white; border-radius: 10px; padding: 20px 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s ease; }
+        .trilha-passo:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.08); }
+
+        /* Ponto indicador na linha da trilha */
+        .trilha-passo::before { content: ''; position: absolute; left: -25px; top: 50%; transform: translateY(-50%); width: 14px; height: 14px; border-radius: 50%; background: #94a3b8; border: 4px solid #f0f2f5; z-index: 2; }
+
+        .trilha-passo.concluido::before { background: #10b981; }
+        .trilha-passo.andamento::before { background: #f59e0b; }
+        .trilha-passo.refazer::before { background: #ef4444; }
+
+        .info-modulo { max-width: 60%; }
+        .info-modulo a { font-size: 18px; font-weight: bold; text-decoration: none; color: #004080; display: inline-block; margin-bottom: 5px; }
+        .info-modulo a:hover { text-decoration: underline; }
+        .info-modulo p { margin: 0; color: #64748b; font-size: 13px; line-height: 1.4; }
+
+        .status-badge-container { text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+
+        .badge-status { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .bg-concluido { background-color: #d1fae5; color: #065f46; }
+        .bg-refazer { background-color: #fee2e2; color: #991b1b; }
+        .bg-andamento { background-color: #fef3c7; color: #92400e; }
+        .bg-nao-iniciado { background-color: #f1f5f9; color: #475569; }
+
+        /* Estilo da Badge de Conquista (Medalha) */
+        .conquista-badge { display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #fef08a, #fde047); color: #713f12; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #facc15; }
+
+        .btn-acao { display: inline-block; padding: 8px 16px; background-color: #004080; color: white; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: bold; transition: background 0.2s; }
+        .btn-acao:hover { background-color: #002b55; }
+
+        .btn-sair { background-color: #ef4444; color: white; padding: 6px 14px; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: bold; }
+        .btn-sair:hover { background-color: #dc2626; }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>Trilha de Aprendizagem</h2>
+        <div>
+            {% if user.is_authenticated %}
+                <span>Olá, <strong>{{ user.first_name|default:user.username }}</strong></span>
+                <a href="{% url 'logout' %}" class="btn-sair" style="margin-left: 15px;">Sair</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <div class="container">
+        {% if user.is_authenticated %}
+            <div class="trilha-header">
+                <h2>Sua Jornada de Conscientização Digital</h2>
+                <p>Complete os módulos em sequência, teste os seus conhecimentos e conquiste badges de especialista em segurança!</p>
+            </div>
+
+            <div class="trilha-container">
+                {% for item in progresso_modulos %}
+                    <div class="trilha-passo {% if item.status == 'Concluído' %}concluido{% elif item.status == 'Em Andamento' %}andamento{% elif item.status == 'Abaixo de 70% (Refazer)' %}refazer{% endif %}">
+
+                        <div class="info-modulo">
+                            <span style="font-size: 12px; font-weight: bold; color: #94a3b8; text-transform: uppercase;">Módulo 0{{ forloop.counter }}</span><br>
+                            <a href="{% url 'detalhe_modulo' item.modulo.id %}">{{ item.modulo.titulo }}</a>
+                            <p>{{ item.modulo.descricao|default:item.modulo.explicacao_pratica }}</p>
+                        </div>
+
+                        <div class="status-badge-container">
+                            <!-- Status do Módulo -->
+                            {% if item.status == "Concluído" %}
+                                <span class="badge-badge badge-status bg-concluido">CONCLUÍDO ({{ item.acertos }}/{{ item.total }})</span>
+                                <!-- Badge de Conquista (Gamificação) -->
+                                <div class="conquista-badge">
+                                    🏆 Badge: Especialista em {{ item.modulo.titulo }}
+                                </div>
+                                <a href="{% url 'detalhe_modulo' item.modulo.id %}" class="btn-acao" style="background-color: #10b981;">Rever Módulo</a>
+
+                            {% elif item.status == "Abaixo de 70% (Refazer)" %}
+                                <span class="badge-status bg-refazer">ABAIXO DE 70% ({{ item.acertos }}/{{ item.total }})</span>
+                                <a href="{% url 'detalhe_modulo' item.modulo.id %}" class="btn-acao" style="background-color: #ef4444;">Refazer Módulo</a>
+
+                            {% elif item.status == "Em Andamento" %}
+                                <span class="badge-status bg-andamento">EM ANDAMENTO</span>
+                                <a href="{% url 'detalhe_modulo' item.modulo.id %}" class="btn-acao" style="background-color: #f59e0b;">Continuar</a>
+
+                            {% else %}
+                                <span class="badge-status bg-nao-iniciado">NÃO INICIADO</span>
+                                <a href="{% url 'detalhe_modulo' item.modulo.id %}" class="btn-acao">Iniciar Módulo</a>
+                            {% endif %}
+                        </div>
+
+                    </div>
+                {% endfor %}
+            </div>
+
+        {% endif %}
+    </div>
+</body>
+</html>

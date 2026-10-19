@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado - {{ modulo.titulo }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f9; color: #333; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .box-resultado { background-color: #e9ecef; padding: 20px; border-radius: 5px; margin-bottom: 25px; }
+        .feedback-card { background: #fff; border: 1px solid #ccc; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+        .btn { display: inline-block; padding: 10px 20px; text-decoration: none; border-radius: 4px; font-weight: bold; margin-right: 10px; }
+        .btn-azul { background-color: #004080; color: white; }
+        .btn-vermelho { background-color: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Resultado do Módulo: {{ modulo.titulo }}</h1>
+
+        <div class="box-resultado">
+            <h2>Sua pontuação: {{ acertos }} de {{ total_perguntas }} acertos!</h2>
+
+            {% if acertos >= 4 %}
+                <p style="color: green; font-weight: bold;">Parabéns! Você atingiu a meta de aproveitamento e concluiu este módulo com sucesso.</p>
+            {% else %}
+                <p style="color: #dc3545; font-weight: bold;">⚠️ Atenção: Sua pontuação ficou abaixo de 70%. É altamente recomendável que você estude os feedbacks abaixo e refaça o módulo para garantir sua proteção digital.</p>
+                <a href="{% url 'detalhe_modulo' modulo.id %}" class="btn btn-vermelho">Refazer Módulo Agora</a>
+            {% endif %}
+        </div>
+
+        <h3>Correção e Feedbacks Educativos:</h3>
+
+        {% for item in detalhes_respostas %}
+            <div class="feedback-card" style="border-left: 5px solid {% if item.acertou %}#28a745{% else %}#dc3545{% endif %};">
+                <p><strong>Questão:</strong> {{ item.pergunta.texto_pergunta }}</p>
+                <p><strong>Sua resposta:</strong> {{ item.escolhida.texto_alternativa }}</p>
+
+                <p>
+                    <strong>Status:</strong>
+                    {% if item.acertou %}
+                        <span style="color: green; font-weight: bold;">Correto!</span>
+                    {% else %}
+                        <span style="color: red; font-weight: bold;">Incorreto.</span>
+                    {% endif %}
+                </p>
+
+                <div style="background-color: #f8f9fa; padding: 10px; margin-top: 10px; border-radius: 4px;">
+                    <strong>Por que isso importa (Feedback):</strong>
+                    <p>{{ item.feedback }}</p>
+                </div>
+            </div>
+        {% endfor %}
+
+        <br>
+        <div style="display: flex; gap: 10px;">
+            <a href="{% url 'home' %}" class="btn btn-azul">← Voltar para a Página Inicial (Painel)</a>
+            <a href="{% url 'detalhe_modulo' modulo.id %}" class="btn" style="background-color: #6c757d; color: white;">Refazer este Módulo</a>
+        </div>
+    </div>
+</body>
+</html>
