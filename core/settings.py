@@ -139,3 +139,21 @@ LOGOUT_REDIRECT_URL = '/login/'
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
+
+# Configuração fixa do Social Login do Google (Impede perda ao reiniciar a nuvem)
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '955583346652-tjrjfbap5299aafevuu11hss6k9psne9.apps.googleusercontent.com',
+            'secret': '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',
+            'key': ''
+        },
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
