@@ -1,10 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Completar Registo - Sistema Educativo</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f6f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-card { background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        h2 { color: #004080; margin-bottom: 15px; }
+        p { color: #666; font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 13px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        .btn-submit { width: 100%; padding: 12px; background-color: #004080; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-submit:hover { background-color: #003366; }
+        .back-link { display: inline-block; margin-top: 20px; color: #004080; text-decoration: none; font-size: 14px; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
 </head>
 <body>
+    <div class="login-card">
+        <h2>Completar Registo</h2>
+        <p>A sua conta Google foi validada com sucesso! Por favor, confirme ou complete o seu e-mail para finalizar o acesso à plataforma.</p>
 
+        <form class="signup" id="signup_form" method="post" action="{% url 'socialaccount_signup' %}">
+            {% csrf_token %}
+
+            <div class="form-group">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+                {{ form.email.errors }}
+            </div>
+
+            <button type="submit" class="btn-submit">Concluir Registo & Entrar</button>
+        </form>
+
+        <a href="{% url 'login' %}" class="back-link">← Cancelar e voltar</a>
+    </div>
 </body>
 </html>
