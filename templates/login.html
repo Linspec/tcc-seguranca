@@ -41,10 +41,10 @@
 
         {% load socialaccount %}
 
-        <!-- Botão de Login Social Google Direto -->
+        <!-- Botão de Login Social Google Forçando Seleção de Conta -->
         <div style="margin-top: 20px; text-align: center;">
             <p style="color: #666; font-size: 13px; margin-bottom: 10px;">ou aceda de forma rápida com:</p>
-            <a href="{% provider_login_url 'google' %}" style="display: inline-block; background-color: #4285F4; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <a href="{% provider_login_url 'google' prompt='select_account' %}" style="display: inline-block; background-color: #4285F4; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                 🔵 Entrar com a Conta Google
             </a>
         </div>
