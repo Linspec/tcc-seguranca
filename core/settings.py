@@ -140,12 +140,46 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
-# Configuração fixa do Social Login do Google (Impede perda ao reiniciar a nuvem)
+# ==========================================
+# CONFIGURAÇÕES DO ALLAUTH (LOGIN SOCIAL SEGURO)
+# ==========================================
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+
+# ==========================================
+# CONFIGURAÇÕES DO ALLAUTH (LOGIN SOCIAL SEGURO)
+# ==========================================
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/login/'
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
+
+# Configuração fixa do Social Login do Google de forma segura
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {
-            'client_id': '955583346652-tjrjfbap5299aafevuu11hss6k9psne9.apps.googleusercontent.com',
-            'secret': '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',
+            'client_id': os.environ.get('GOOGLE_CLIENT_ID', ''),
+            'secret': os.environ.get('GOOGLE_CLIENT_SECRET', ''),
             'key': ''
         },
         'SCOPE': [
