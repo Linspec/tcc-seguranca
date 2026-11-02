@@ -15,10 +15,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 SECRET_KEY = 'django-insecure-z#s2imem4)z%w53^f)49lyrai*qgm&k3br9p&9$ck&mt*n%qy&'
 
-# DEBUG deve ser False em produção (Render), mas deixamos True para desenvolvimento/testes
+# DEBUG tem que ser falso em produção pro Render, tá True para fazer teste ou para lançar pro desenvolvimento
 DEBUG = True
 
-# Permite acessos tanto locais quanto do Render
+# acesso do Render
 ALLOWED_HOSTS = ['*']
 
 
@@ -31,21 +31,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Apps do allauth para suporte a login social (Google)
+    # suporte para o login social da google
     'django.contrib.sites',
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
 
-    # O aplicativo do seu TCC
+    # O aplicativo do TCC
     'plataforma',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
 
-    # Middleware obrigatório para arquivos estáticos no Render (WhiteNoise)
+    # Middleware dos arquivos estáticos no Render
     'whitenoise.middleware.WhiteNoiseMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -80,7 +80,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 
 # Database
-# Lê a URL do banco na nuvem. Se não existir (no seu PC local), usa o SQLite padrão.
+# Lê a URL do banco na nuvem. Se não existir, usa o SQLite
 DATABASES = {
     'default': dj_database_url.config(
         default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
@@ -117,10 +117,10 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Modelo Customizado de Utilizador
+# modelo customizado do usuario
 AUTH_USER_MODEL = 'plataforma.Usuario'
 
-# Configuração de E-mail (Modo Consola para Evidência no TCC)
+# Configuração de E-mail
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
@@ -145,12 +145,12 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 
-# Auto-conexão para evitar telas de erro ou "Falha no login de terceiros"
+# conecta direto pra pular a tela de erro
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
 
-# Configuração fixa do Social Login do Google de forma segura via variáveis de ambiente
+# Conexão google
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
         'APP': {

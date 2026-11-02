@@ -27,7 +27,7 @@ def login_view(request):
 
 def logout_view(request):
     auth_logout(request)
-    request.session.flush()  # Limpa completamente a sessão do navegador
+    request.session.flush()  # Limpa o navegador
     return redirect('login')
 
 
@@ -176,12 +176,12 @@ def detalhe_modulo(request, modulo_id):
 
     modulo = get_object_or_404(Modulo, id=modulo_id)
 
-    # Seleciona aleatoriamente até 10 perguntas do módulo
+    # seleciona aleatoriamente as 10 perguntas do módulo
     todas_perguntas = list(modulo.perguntas.all())
     random.shuffle(todas_perguntas)
     perguntas = todas_perguntas[:10]
 
-    # Embaralha as alternativas de cada pergunta
+    # embaralha as alternativas
     for p in perguntas:
         alternativas = list(p.alternativas.all())
         random.shuffle(alternativas)
@@ -191,7 +191,7 @@ def detalhe_modulo(request, modulo_id):
         avaliacao_mod = request.POST.get('avaliacao_modulo', '')
         como_ajudou_mod = request.POST.get('como_ajudou', '')
 
-        # Remove respostas anteriores deste módulo para recalcular
+        # remove respostas anteriores do módulo para recalcular
         RespostaUsuario.objects.filter(usuario=request.user, pergunta__in=todas_perguntas).delete()
 
         acertos = 0
